@@ -27,7 +27,7 @@ lint_go_snippets() {
 
 if [ "$1" = "" ]
 then
-	echo "usage: lint_markdown_snippets.sh FILENAME"
+	echo "usage: lintdown.sh FILENAME"
 	exit 1
 fi
 
