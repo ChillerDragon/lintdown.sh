@@ -20,6 +20,15 @@ func main() {
 
 ## supported languages
 
-- go
-- lua
+### go
+
+Needs `go` to be installed in PATH.
+
+### lua
+
+Needs `luacheck` to be installed in PATH.
+
+```
+luarocks install luacheck
+```
 
