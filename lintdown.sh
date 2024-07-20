@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -euo pipefail
+set -ueo pipefail
+IFS=$'\n\t'
 
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
@@ -31,13 +32,28 @@ gen_snippets() {
 	local markdown_lang="$2"
 	local lang_extension="${3:-$markdown_lang}"
 
-	awk '/^```'"$markdown_lang"'$/ {p=1}; p; /^```$/ {p=0;print"--- --- ---"}' "$markdown_file" |
-		grep -vE '^```('"$markdown_lang"')?$' |
-		csplit \
-		-z -s - '/--- --- ---/' \
-		'{*}' \
-		--suppress-matched \
-		-f "$TMP_DIR/readme_snippet_" -b '%02d.'"$lang_extension"
+	local in_snippet=0
+	local snippet_num=0
+	local snippet_path="invalid_snippet.txt"
+
+	while IFS='' read -r line
+	do
+		if [[ "$line" =~ ^\`\`\`$markdown_lang$ ]]
+		then
+			snippet_path="$TMP_DIR/readme_snippet_${snippet_num}.${lang_extension}"
+			:>"$snippet_path"
+			snippet_num="$((snippet_num + 1))"
+			in_snippet=1
+			continue
+		fi
+		if [ "$line" == '```' ] && [ "$in_snippet" == 1 ]
+		then
+			in_snippet=0
+		fi
+		[ "$in_snippet" = 1 ] || continue
+
+		cat <<< "$line" >> "$snippet_path"
+	done < "$markdown_file"
 }
 
 lint_go_snippets() {
