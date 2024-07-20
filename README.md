@@ -9,8 +9,10 @@ This go snippet is linted by this [github action](https://github.com/ChillerDrag
 ```go
 package main
 
+import "fmt"
+
 func main() {
-    if this is not valid go code the CI fails
+	fmt.Print("if this is not valid go code the CI fails")
 }
 ```
 
