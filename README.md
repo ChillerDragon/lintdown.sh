@@ -18,3 +18,8 @@ func main() {
 }
 ```
 
+## supported languages
+
+- go
+- lua
+
