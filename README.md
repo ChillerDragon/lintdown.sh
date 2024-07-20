@@ -16,7 +16,7 @@ func main() {
 }
 ```
 
-## supported languages
+## Supported languages
 
 ### go
 
