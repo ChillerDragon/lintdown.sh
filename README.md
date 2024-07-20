@@ -58,5 +58,10 @@ Otherwise it defaults to POSIX shell.
 ## python
 
 It will run all linters it can find in PATH.
-It will be looking for `mypy`, `pyright` and `pylint`
+It will be looking for `mypy`, `pyright` and `pylint`.
+
+## javascript
+
+It will run all linters it can find in PATH.
+It will be looking for `eslint` and `standard`.
 

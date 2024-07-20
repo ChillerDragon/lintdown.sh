@@ -144,6 +144,19 @@ lint_shell_snippets() {
 	done
 }
 
+try_linters() {
+	local snippet="$1"
+	shift
+	local linter
+	for linter in "$@"
+	do
+		[ -x "$(command -v "$linter")" ] || continue
+		log "found $linter"
+
+		"$linter" "$snippet" || lint_failed "$snippet"
+	done
+}
+
 lint_python_snippets() {
 	local markdown_file="$1"
 	local snippet
@@ -156,13 +169,21 @@ lint_python_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		for py_linter in pylint mypy pyright
-		do
-			[ -x "$(command -v "$py_linter")" ] || continue
-			log "found $py_linter"
+		try_linters "$snippet" pylint mypy pyright
+	done
+}
 
-			"$py_linter" "$snippet" || lint_failed "$snippet"
-		done
+lint_javascript_snippets() {
+	local markdown_file="$1"
+	local snippet
+	gen_snippets "$markdown_file" js
+	gen_snippets "$markdown_file" javascript js
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.js; do
+		[ -f "$snippet" ] || continue
+
+		log "checking $snippet ..."
+		try_linters "$snippet" eslint standard
 	done
 }
 
@@ -184,4 +205,5 @@ lint_lua_snippets "$file"
 lint_ruby_snippets "$file"
 lint_shell_snippets "$file"
 lint_python_snippets "$file"
+lint_javascript_snippets "$file"
 
