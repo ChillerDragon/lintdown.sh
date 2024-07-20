@@ -2,6 +2,9 @@
 
 Shell script to lint code snippets in markdown. Check your README.md in the CI!
 
+All linters should just be static code analysis and the snippets are not actually executed.
+Untrusted markdown files should still be handled with caution.
+
 ## Example
 
 This go snippet is linted by this [github action](https://github.com/ChillerDragon/lintdown.sh/blob/master/.github/workflows/lintdown.yml)
