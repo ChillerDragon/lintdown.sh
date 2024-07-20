@@ -178,12 +178,35 @@ lint_javascript_snippets() {
 	local snippet
 	gen_snippets "$markdown_file" js
 	gen_snippets "$markdown_file" javascript js
+	gen_snippets "$markdown_file" JavaScript js
+	gen_snippets "$markdown_file" node js
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.js; do
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
 		try_linters "$snippet" eslint standard
+	done
+}
+
+lint_typescript_snippets() {
+	local markdown_file="$1"
+	local snippet
+	gen_snippets "$markdown_file" typescript ts
+	gen_snippets "$markdown_file" TypeScript ts
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.ts; do
+		[ -f "$snippet" ] || continue
+
+		log "building $snippet ..."
+		tsc "$snippet" || lint_failed "$snippet"
+	done
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.ts; do
+		[ -f "$snippet" ] || continue
+
+		log "linting $snippet ..."
+		try_linters "$snippet" ts-standard
 	done
 }
 
@@ -206,4 +229,5 @@ lint_ruby_snippets "$file"
 lint_shell_snippets "$file"
 lint_python_snippets "$file"
 lint_javascript_snippets "$file"
+lint_typescript_snippets "$file"
 

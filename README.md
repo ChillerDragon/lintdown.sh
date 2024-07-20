@@ -65,3 +65,8 @@ It will be looking for `mypy`, `pyright` and `pylint`.
 It will run all linters it can find in PATH.
 It will be looking for `eslint` and `standard`.
 
+## typescript
+
+Needs `tsc` to be installed in PATH.
+If `ts-standard` is installed it will also run that.
+
