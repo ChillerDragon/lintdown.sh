@@ -54,3 +54,9 @@ So make sure to either add a shebang (`#!/bin/bash`) to the first line of your s
 Or be specific with the markdown language annotation. Use ```\`\`\`bash``` instead of just ```\`\`\`shell```.
 Otherwise it defaults to POSIX shell.
 
+
+## python
+
+It will run all linters it can find in PATH.
+It will be looking for `mypy`, `pyright` and `pylint`
+

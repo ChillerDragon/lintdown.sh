@@ -27,6 +27,14 @@ cleanup() {
 
 trap cleanup EXIT
 
+lint_failed() {
+	local snippet="$1"
+	err "linter failed on $(basename "$snippet") check the errors above"
+	err "snippet content:"
+	cat "$snippet" 1>&2
+	exit 1
+}
+
 gen_snippets() {
 	local markdown_file="$1"
 	local markdown_lang="$2"
@@ -64,7 +72,7 @@ lint_go_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "building $snippet ..."
-		go build -v -o tmp/tmp "$snippet" || exit 1
+		go build -v -o tmp/tmp "$snippet" || lint_failed "$snippet"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.go; do
@@ -72,7 +80,7 @@ lint_go_snippets() {
 
 		log "checking format $snippet ..."
 		if ! diff -u <(echo -n) <(gofmt -d "$snippet"); then
-			exit 1
+			lint_failed "$snippet"
 		fi
 	done
 }
@@ -85,19 +93,20 @@ lint_lua_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		luacheck "$snippet" || exit 1
+		luacheck "$snippet" || lint_failed "$snippet"
 	done
 }
 
 lint_ruby_snippets() {
 	local markdown_file="$1"
+	local snippet
 	gen_snippets "$markdown_file" ruby rb
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.rb; do
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		rubocop --except Style/FrozenStringLiteralComment "$snippet" || exit 1
+		rubocop --except Style/FrozenStringLiteralComment "$snippet" || lint_failed "$snippet"
 	done
 }
 
@@ -114,6 +123,7 @@ add_shell_shebang() {
 
 lint_shell_snippets() {
 	local markdown_file="$1"
+	local snippet
 	gen_snippets "$markdown_file" shell sh
 	gen_snippets "$markdown_file" bash bash
 	gen_snippets "$markdown_file" sh sh
@@ -123,14 +133,36 @@ lint_shell_snippets() {
 
 		log "checking $snippet ..."
 		add_shell_shebang "$snippet"
-		shellcheck "$snippet" || exit 1
+		shellcheck "$snippet" || lint_failed "$snippet"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.bash; do
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		shellcheck "$snippet" || exit 1
+		shellcheck "$snippet" || lint_failed "$snippet"
+	done
+}
+
+lint_python_snippets() {
+	local markdown_file="$1"
+	local snippet
+	gen_snippets "$markdown_file" py
+	gen_snippets "$markdown_file" python py
+	gen_snippets "$markdown_file" python3 py
+	gen_snippets "$markdown_file" python2 py
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.py; do
+		[ -f "$snippet" ] || continue
+
+		log "checking $snippet ..."
+		for py_linter in pylint mypy pyright
+		do
+			[ -x "$(command -v "$py_linter")" ] || continue
+			log "found $py_linter"
+
+			"$py_linter" "$snippet" || lint_failed "$snippet"
+		done
 	done
 }
 
@@ -151,4 +183,5 @@ lint_go_snippets "$file"
 lint_lua_snippets "$file"
 lint_ruby_snippets "$file"
 lint_shell_snippets "$file"
+lint_python_snippets "$file"
 
