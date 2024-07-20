@@ -73,6 +73,32 @@ lint_lua_snippets() {
 	done
 }
 
+lint_ruby_snippets() {
+	local markdown_file="$1"
+	gen_snippets "$markdown_file" ruby rb
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.rb; do
+		[ -f "$snippet" ] || continue
+
+		log "checking $snippet ..."
+		rubocop "$snippet" || exit 1
+	done
+}
+
+lint_shell_snippets() {
+	local markdown_file="$1"
+	gen_snippets "$markdown_file" shell sh
+	gen_snippets "$markdown_file" bash sh
+	gen_snippets "$markdown_file" sh sh
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.sh; do
+		[ -f "$snippet" ] || continue
+
+		log "checking $snippet ..."
+		shellcheck "$snippet" || exit 1
+	done
+}
+
 if [ "${1:-}" = "" ]
 then
 	printf "usage: lintdown.sh FILENAME\n" 1>&2
@@ -88,4 +114,6 @@ fi
 
 lint_go_snippets "$file"
 lint_lua_snippets "$file"
+lint_ruby_snippets "$file"
+lint_shell_snippets "$file"
 

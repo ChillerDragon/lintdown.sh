@@ -30,3 +30,19 @@ Needs `luacheck` to be installed in PATH.
 luarocks install luacheck
 ```
 
+### ruby
+
+Needs `rubocop` to be installed in PATH.
+
+```
+gem install rubocop
+```
+
+## shell (bash and POSIX sh)
+
+Needs `shellcheck` to be installed in PATH.
+
+```
+apt-get install shellcheck
+```
+
