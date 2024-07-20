@@ -81,17 +81,36 @@ lint_ruby_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		rubocop "$snippet" || exit 1
+		rubocop --except Style/FrozenStringLiteralComment "$snippet" || exit 1
 	done
+}
+
+add_shell_shebang() {
+	local snippet="$1"
+	if grep -q '^#!/' "$snippet"
+	then
+		return
+	fi
+	log "no shebang found patching /bin/sh shebang ..."
+	sed '1s/^/#!\/bin\/sh\n/' "$snippet" > "$snippet".tmp
+	mv "$snippet".tmp "$snippet"
 }
 
 lint_shell_snippets() {
 	local markdown_file="$1"
 	gen_snippets "$markdown_file" shell sh
-	gen_snippets "$markdown_file" bash sh
+	gen_snippets "$markdown_file" bash bash
 	gen_snippets "$markdown_file" sh sh
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.sh; do
+		[ -f "$snippet" ] || continue
+
+		log "checking $snippet ..."
+		add_shell_shebang "$snippet"
+		shellcheck "$snippet" || exit 1
+	done
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.bash; do
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."

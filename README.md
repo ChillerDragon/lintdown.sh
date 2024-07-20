@@ -46,3 +46,8 @@ Needs `shellcheck` to be installed in PATH.
 apt-get install shellcheck
 ```
 
+ShellCheck supports multiple shells so it needs to know which one it is.
+So make sure to either add a shebang (`#!/bin/bash`) to the first line of your snippet.
+Or be specific with the markdown language annotation. Use ```\`\`\`bash``` instead of just ```\`\`\`shell```.
+Otherwise it defaults to POSIX shell.
+
