@@ -3,6 +3,13 @@
 set -ueo pipefail
 IFS=$'\n\t'
 
+# You can set any of those environment variables
+# if you want to want something other than the defaults
+
+# for C
+CC="${CC:-gcc}"
+LDFLAGS="${LDFLAGS:-}"
+
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
 }
@@ -62,6 +69,20 @@ gen_snippets() {
 
 		cat <<< "$line" >> "$snippet_path"
 	done < "$markdown_file"
+}
+
+lint_c_snippets() {
+	local markdown_file="$1"
+	gen_snippets "$markdown_file" c c
+	gen_snippets "$markdown_file" C c
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.c; do
+		[ -f "$snippet" ] || continue
+
+		log "building $snippet ..."
+		# shellcheck disable=2086
+		"$CC" "$snippet" -o "$TMP_DIR"/tmp $LDFLAGS || lint_failed "$snippet"
+	done
 }
 
 lint_go_snippets() {
@@ -223,6 +244,7 @@ then
 	exit 1
 fi
 
+lint_c_snippets "$file"
 lint_go_snippets "$file"
 lint_lua_snippets "$file"
 lint_ruby_snippets "$file"
