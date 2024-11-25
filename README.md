@@ -80,4 +80,4 @@ such as ``LDFLAGS=-lSDL lintdown.sh README.md``
 
 ## Projects using lintdown.sh
 
-- https://github.com/teeworlds-go/protocol/ [github action](https://github.com/teeworlds-go/protocol/blob/bee29bd3ecb6c688c07d72be66e452eac95045d6/.github/workflows/main.yml#L33-L38)
+- https://github.com/teeworlds-go/protocol/ - go lang ([github action](https://github.com/teeworlds-go/protocol/blob/bee29bd3ecb6c688c07d72be66e452eac95045d6/.github/workflows/main.yml#L33-L38))
