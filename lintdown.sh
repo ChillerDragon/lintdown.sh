@@ -7,8 +7,11 @@ IFS=$'\n\t'
 # if you want to want something other than the defaults
 
 # for C
+# https://www.gnu.org/software/make/manual/html_node/Implicit-Variables.html
 CC="${CC:-gcc}"
 LDFLAGS="${LDFLAGS:-}"
+LDLIBS="${LDLIBS:-}"
+CFLAGS="${CLFAGS:-}"
 
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
@@ -81,7 +84,7 @@ lint_c_snippets() {
 
 		log "building $snippet ..."
 		# shellcheck disable=2086
-		"$CC" "$snippet" -o "$TMP_DIR"/tmp $LDFLAGS || lint_failed "$snippet"
+		"$CC" $CFLAGS "$snippet" -o "$TMP_DIR"/tmp $LDFLAGS $LDLIBS || lint_failed "$snippet"
 	done
 }
 

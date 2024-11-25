@@ -75,8 +75,8 @@ If `ts-standard` is installed it will also run that.
 Needs ``gcc`` to be installed in PATH.
 You can also change the compiler by setting the CC environment variable
 for example ``CC=clang lintdown.sh README.md``
-You can also set LDFLAGS if you want to link some libraries
-such as ``LDFLAGS=-lSDL lintdown.sh README.md``
+You can also set LDFLAGS, LDLIBS, CFLAGS if you want to link some libraries or set compiler options
+such as ``LDLIBS=-lSDL lintdown.sh README.md``
 
 ## Projects using lintdown.sh
 
