@@ -55,22 +55,22 @@ Or be specific with the markdown language annotation. Use ```\`\`\`bash``` inste
 Otherwise it defaults to POSIX shell.
 
 
-## python
+### python
 
 It will run all linters it can find in PATH.
 It will be looking for `mypy`, `pyright` and `pylint`.
 
-## javascript
+### javascript
 
 It will run all linters it can find in PATH.
 It will be looking for `eslint` and `standard`.
 
-## typescript
+### typescript
 
 Needs `tsc` to be installed in PATH.
 If `ts-standard` is installed it will also run that.
 
-## C
+### C
 
 Needs ``gcc`` to be installed in PATH.
 You can also change the compiler by setting the CC environment variable
@@ -78,3 +78,6 @@ for example ``CC=clang lintdown.sh README.md``
 You can also set LDFLAGS if you want to link some libraries
 such as ``LDFLAGS=-lSDL lintdown.sh README.md``
 
+## Projects using lintdown.sh
+
+- https://github.com/teeworlds-go/protocol/ [github action](https://github.com/teeworlds-go/protocol/blob/bee29bd3ecb6c688c07d72be66e452eac95045d6/.github/workflows/main.yml#L33-L38)
