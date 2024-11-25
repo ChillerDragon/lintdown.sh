@@ -76,5 +76,5 @@ Needs ``gcc`` to be installed in PATH.
 You can also change the compiler by setting the CC environment variable
 for example ``CC=clang lintdown.sh README.md``
 You can also set LDFLAGS if you want to link some libraries
-such as ``LDFLAGS=lSDL lintdown.sh README.md``
+such as ``LDFLAGS=-lSDL lintdown.sh README.md``
 
