@@ -70,3 +70,11 @@ It will be looking for `eslint` and `standard`.
 Needs `tsc` to be installed in PATH.
 If `ts-standard` is installed it will also run that.
 
+## C
+
+Needs ``gcc`` to be installed in PATH.
+You can also change the compiler by setting the CC environment variable
+for example ``CC=clang lintdown.sh README.md``
+You can also set LDFLAGS if you want to link some libraries
+such as ``LDFLAGS=lSDL lintdown.sh README.md``
+
