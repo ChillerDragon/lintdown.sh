@@ -60,6 +60,11 @@ Otherwise it defaults to POSIX shell.
 It will run all linters it can find in PATH.
 It will be looking for `mypy`, `pyright` and `pylint`.
 
+You can provide cli arguments to all these linters using these
+environment variables: `MYPY_ARGS`, `PYRIGHT_ARGS` and `PYLINT_ARGS`
+
+The pylint args are by default set to ``PYLINT_ARGS='--disable=W0105,C0301'``
+
 ### javascript
 
 It will run all linters it can find in PATH.

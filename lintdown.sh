@@ -13,6 +13,10 @@ LDFLAGS="${LDFLAGS:-}"
 LDLIBS="${LDLIBS:-}"
 CFLAGS="${CLFAGS:-}"
 
+# for python
+# shellcheck disable=SC2034
+PYLINT_ARGS='--disable=W0105,C0301'
+
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
 }
@@ -176,8 +180,18 @@ try_linters() {
 	do
 		[ -x "$(command -v "$linter")" ] || continue
 		log "found $linter"
+		local linter_args_var
+		linter_args_var="${linter^^}_ARGS"
+		# might be undefined
+		# but expands for example
+		#
+		# PYLINT_ARGS
+		set +u
+		local linter_args="${!linter_args_var}"
+		set -u
 
-		"$linter" "$snippet" || lint_failed "$snippet"
+		# shellcheck disable=SC2086
+		"$linter" $linter_args "$snippet" || lint_failed "$snippet"
 	done
 }
 
