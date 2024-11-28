@@ -92,3 +92,4 @@ such as ``LDLIBS=-lSDL lintdown.sh README.md``
 ## Projects using lintdown.sh
 
 - https://github.com/teeworlds-go/protocol/ - go lang ([github action](https://github.com/teeworlds-go/protocol/blob/bee29bd3ecb6c688c07d72be66e452eac95045d6/.github/workflows/main.yml#L33-L38))
+- https://github.com/MilkeeyCat/ddnet_protocol/ - C library ([github action](https://github.com/MilkeeyCat/ddnet_protocol/blob/1586fcf7ef3e992f6748a47e1afe8dffc40dc024/.github/workflows/install.yml#L47-L52))
