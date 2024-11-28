@@ -142,7 +142,7 @@ lint_go_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "building $snippet ..."
-		go build -v -o tmp/tmp "$snippet" || lint_failed "$snippet"
+		go build -v -o "$TMP_DIR"/tmp "$snippet" || lint_failed "$snippet"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.go; do
