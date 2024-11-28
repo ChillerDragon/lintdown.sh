@@ -23,7 +23,7 @@ SHELLCHECK_ARGS=${SHELLCHECK_ARGS:--e 'SC1091,SC2164'}
 
 # for ruby
 # shellcheck disable=SC2034
-RUBOCOP_ARGS=${RUBOCOP_ARGS:---except Style/FrozenStringLiteralComment}
+RUBOCOP_ARGS=${RUBOCOP_ARGS:---except Style/FrozenStringLiteralComment,Lint/ScriptPermission}
 
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
