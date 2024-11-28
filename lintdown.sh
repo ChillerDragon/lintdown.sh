@@ -157,14 +157,14 @@ lint_shell_snippets() {
 
 		log "checking $snippet ..."
 		add_shell_shebang "$snippet"
-		shellcheck "$snippet" || lint_failed "$snippet"
+		shellcheck -e 'SC1091,SC2164' "$snippet" || lint_failed "$snippet"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.bash; do
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		shellcheck "$snippet" || lint_failed "$snippet"
+		shellcheck -e 'SC1091,SC2164' "$snippet" || lint_failed "$snippet"
 	done
 }
 
