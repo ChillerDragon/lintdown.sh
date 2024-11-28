@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -ueo pipefail
-IFS=$'\n\t'
+IFS=$'\n\t '
 
 # You can set any of those environment variables
 # if you want to want something other than the defaults
@@ -15,15 +15,15 @@ CFLAGS="${CLFAGS:-}"
 
 # for python
 # shellcheck disable=SC2034
-PYLINT_ARGS="${PYLINT_ARGS:-'--disable=W0105,C0301'}"
+PYLINT_ARGS=${PYLINT_ARGS:---disable=W0105,C0301}
 
 # for shell (bash/posix)
 # shellcheck disable=SC2034
-SHELLCHECK_ARGS="${SHELLCHECK_ARGS:-"-e 'SC1091,SC2164'"}"
+SHELLCHECK_ARGS=${SHELLCHECK_ARGS:--e 'SC1091,SC2164'}
 
 # for ruby
 # shellcheck disable=SC2034
-RUBOCOP_ARGS="${RUBOCOP_ARGS:-"--except Style/FrozenStringLiteralComment"}"
+RUBOCOP_ARGS=${RUBOCOP_ARGS:---except Style/FrozenStringLiteralComment}
 
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
@@ -69,7 +69,7 @@ run_linter_or_die() {
 	#
 	# PYLINT_ARGS
 	set +u
-	local linter_args="${!linter_args_var}"
+	local linter_args=${!linter_args_var}
 	set -u
 
 	# shellcheck disable=SC2086
