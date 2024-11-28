@@ -17,6 +17,10 @@ CFLAGS="${CLFAGS:-}"
 # shellcheck disable=SC2034
 PYLINT_ARGS='--disable=W0105,C0301'
 
+# for shell (bash/posix)
+# shellcheck disable=SC2034
+SHELLCHECK_ARGS="-e 'SC1091,SC2164'"
+
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
 }
@@ -47,6 +51,38 @@ lint_failed() {
 	err "snippet content:"
 	cat "$snippet" 1>&2
 	exit 1
+}
+
+# run_linter_or_die [linter] [snippet]
+run_linter_or_die() {
+	local linter="$1"
+	local snippet="$2"
+
+	local linter_args_var
+	linter_args_var="${linter^^}_ARGS"
+	# might be undefined
+	# but expands for example
+	#
+	# PYLINT_ARGS
+	set +u
+	local linter_args="${!linter_args_var}"
+	set -u
+
+	# shellcheck disable=SC2086
+	"$linter" $linter_args "$snippet" || lint_failed "$snippet"
+}
+
+try_linters() {
+	local snippet="$1"
+	shift
+	local linter
+	for linter in "$@"
+	do
+		[ -x "$(command -v "$linter")" ] || continue
+		log "found $linter"
+
+		run_linter_or_die "$linter" "$snippet"
+	done
 }
 
 gen_snippets() {
@@ -161,37 +197,14 @@ lint_shell_snippets() {
 
 		log "checking $snippet ..."
 		add_shell_shebang "$snippet"
-		shellcheck -e 'SC1091,SC2164' "$snippet" || lint_failed "$snippet"
+		run_linter_or_die shellcheck "$snippet"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.bash; do
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		shellcheck -e 'SC1091,SC2164' "$snippet" || lint_failed "$snippet"
-	done
-}
-
-try_linters() {
-	local snippet="$1"
-	shift
-	local linter
-	for linter in "$@"
-	do
-		[ -x "$(command -v "$linter")" ] || continue
-		log "found $linter"
-		local linter_args_var
-		linter_args_var="${linter^^}_ARGS"
-		# might be undefined
-		# but expands for example
-		#
-		# PYLINT_ARGS
-		set +u
-		local linter_args="${!linter_args_var}"
-		set -u
-
-		# shellcheck disable=SC2086
-		"$linter" $linter_args "$snippet" || lint_failed "$snippet"
+		run_linter_or_die shellcheck "$snippet"
 	done
 }
 

@@ -45,6 +45,9 @@ gem install rubocop
 
 Needs `shellcheck` to be installed in PATH.
 
+You can provide cli arguments to shellcheck using the `SHELLCHECK_ARGS`
+environment variable. By default it is set to ``SHELLCHECK_ARGS="-e 'SC1091,SC2164'"``
+
 ```
 apt-get install shellcheck
 ```
