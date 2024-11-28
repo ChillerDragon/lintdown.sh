@@ -272,25 +272,69 @@ lint_typescript_snippets() {
 	done
 }
 
+usage() {
+	printf "usage: lintdown.sh FILENAME..\n" 1>&2
+}
+
 if [ "${1:-}" = "" ]
 then
-	printf "usage: lintdown.sh FILENAME\n" 1>&2
+	usage
 	exit 1
 fi
 
-file="$1"
-if [ ! -f "$file" ]
-then
-	err "file not found '$file'"
-	exit 1
-fi
+lint_file() {
+	file="$1"
+	if [ ! -f "$file" ]
+	then
+		err "file not found '$file'"
+		exit 1
+	fi
 
-lint_c_snippets "$file"
-lint_go_snippets "$file"
-lint_lua_snippets "$file"
-lint_ruby_snippets "$file"
-lint_shell_snippets "$file"
-lint_python_snippets "$file"
-lint_javascript_snippets "$file"
-lint_typescript_snippets "$file"
+	lint_c_snippets "$file"
+	lint_go_snippets "$file"
+	lint_lua_snippets "$file"
+	lint_ruby_snippets "$file"
+	lint_shell_snippets "$file"
+	lint_python_snippets "$file"
+	lint_javascript_snippets "$file"
+	lint_typescript_snippets "$file"
+}
+
+main() {
+	local markdown_files=()
+	local arg
+	while true
+	do
+		[ "$#" -gt 0 ] || break
+		arg="$1"
+		shift
+
+		if [ "${arg::1}" = '-' ]
+		then
+			if [ "$arg" == "-h" ] || [ "$arg" == "--help" ]
+			then
+				usage
+				exit 0
+			else
+				err "Unknown argument '$arg'"
+			fi
+		else
+			markdown_files+=("$arg")
+		fi
+	done
+
+	if [ "${#markdown_files[@]}" = "0" ]
+	then
+		usage
+		exit 1
+	fi
+
+	local markdown_file
+	for markdown_file in "${markdown_files[@]}"
+	do
+		lint_file "$markdown_file"
+	done
+}
+
+main "$@"
 
