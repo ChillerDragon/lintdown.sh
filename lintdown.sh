@@ -34,6 +34,7 @@ log() {
 	printf '[lintdown.sh][*] %s\n' "$1"
 }
 
+USER="${USER:-user}"
 if ! TMP_DIR="$(mktemp -d "/tmp/lintdown_sh_${USER}_XXXXXXXX")"
 then
 	err "failed to mktemp"
