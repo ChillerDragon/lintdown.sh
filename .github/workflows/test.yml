@@ -34,3 +34,7 @@ jobs:
       run: |
           ./lintdown.sh tests/valid_snippets.md
 
+    - name: Expect invalid snippets to fail
+      run: |
+          ./lintdown.sh tests/invalid_snippets.md && { printf 'Error: expected lint to fail but it passed!\n'; exit 1; } || true
+
