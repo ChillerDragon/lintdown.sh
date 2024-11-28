@@ -192,6 +192,13 @@ lint_python_snippets() {
 	for snippet in "$TMP_DIR"/readme_snippet_*.py; do
 		[ -f "$snippet" ] || continue
 
+		log "compiling $snippet ..."
+		python -m compileall "$snippet"  || lint_failed "$snippet"
+	done
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.py; do
+		[ -f "$snippet" ] || continue
+
 		log "checking $snippet ..."
 		try_linters "$snippet" pylint mypy pyright
 	done
