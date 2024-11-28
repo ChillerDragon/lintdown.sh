@@ -3,6 +3,8 @@
 set -ueo pipefail
 IFS=$'\n\t '
 
+LINTDOWN_VERSION='1.0.0'
+
 # You can set any of those environment variables
 # if you want to want something other than the defaults
 
@@ -272,7 +274,12 @@ lint_typescript_snippets() {
 	done
 }
 
+show_version() {
+	printf 'lintdown.sh v%s\n' "$LINTDOWN_VERSION"
+}
+
 usage() {
+	show_version
 	printf "usage: lintdown.sh FILENAME..\n" 1>&2
 }
 
@@ -314,6 +321,10 @@ main() {
 			if [ "$arg" == "-h" ] || [ "$arg" == "--help" ]
 			then
 				usage
+				exit 0
+			elif [ "$arg" == "--version" ]
+			then
+				show_version
 				exit 0
 			else
 				err "Unknown argument '$arg'"
