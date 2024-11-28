@@ -37,6 +37,9 @@ luarocks install luacheck
 
 Needs `rubocop` to be installed in PATH.
 
+You can provide cli arguments to rubocop using the `RUBOCOP_ARGS`
+environment variable. By default it is set to ``RUBOCOP_ARGS="--except Style/FrozenStringLiteralComment"``
+
 ```
 gem install rubocop
 ```

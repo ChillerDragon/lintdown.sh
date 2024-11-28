@@ -15,11 +15,15 @@ CFLAGS="${CLFAGS:-}"
 
 # for python
 # shellcheck disable=SC2034
-PYLINT_ARGS='--disable=W0105,C0301'
+PYLINT_ARGS="${PYLINT_ARGS:-'--disable=W0105,C0301'}"
 
 # for shell (bash/posix)
 # shellcheck disable=SC2034
-SHELLCHECK_ARGS="-e 'SC1091,SC2164'"
+SHELLCHECK_ARGS="${SHELLCHECK_ARGS:-"-e 'SC1091,SC2164'"}"
+
+# for ruby
+# shellcheck disable=SC2034
+RUBOCOP_ARGS="${RUBOCOP_ARGS:-"--except Style/FrozenStringLiteralComment"}"
 
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
@@ -157,7 +161,7 @@ lint_lua_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		luacheck "$snippet" || lint_failed "$snippet"
+		run_linter_or_die luacheck "$snippet"
 	done
 }
 
@@ -170,7 +174,7 @@ lint_ruby_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		rubocop --except Style/FrozenStringLiteralComment "$snippet" || lint_failed "$snippet"
+		run_linter_or_die rubocop "$snippet"
 	done
 }
 
@@ -257,7 +261,7 @@ lint_typescript_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "building $snippet ..."
-		tsc "$snippet" || lint_failed "$snippet"
+		run_linter_or_die tsc "$snippet"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.ts; do
