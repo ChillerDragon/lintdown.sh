@@ -31,6 +31,10 @@ SHELLCHECK_ARGS=${SHELLCHECK_ARGS:--e 'SC1091,SC2164'}
 # shellcheck disable=SC2034
 RUBOCOP_ARGS=${RUBOCOP_ARGS:---except Style/FrozenStringLiteralComment,Lint/ScriptPermission}
 
+# regex if matched in the snippet the snippet
+# will not be linted
+ARG_SKIP_PATTERN="${ARG_SKIP_PATTERN:-}"
+
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
 }
@@ -154,13 +158,28 @@ patch_c_includes() {
 	done
 }
 
+skip_snippet() {
+	local snippet="$1"
+	[ -f "$snippet" ] || return 0
+
+	if [ "$ARG_SKIP_PATTERN" != "" ]
+	then
+		if grep -qE "$ARG_SKIP_PATTERN" "$snippet"
+		then
+			return 0
+		fi
+	fi
+
+	return 1
+}
+
 lint_c_snippets() {
 	local markdown_file="$1"
 	gen_snippets "$markdown_file" c c
 	gen_snippets "$markdown_file" C c
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.c; do
-		[ -f "$snippet" ] || continue
+		skip_snippet "$snippet" && continue
 
 		patch_c_includes "$snippet"
 
@@ -316,7 +335,11 @@ show_version() {
 
 usage() {
 	show_version
-	printf "usage: lintdown.sh FILENAME..\n" 1>&2
+	cat <<-EOF
+	usage: lintdown.sh FILENAME..
+	arguments:
+	  --skip-pattern PATTERN      skip snippets that match the given regex"
+	EOF
 }
 
 if [ "${1:-}" = "" ]
@@ -362,6 +385,11 @@ main() {
 			then
 				show_version
 				exit 0
+			elif [ "$arg" == "--skip-pattern" ]
+			then
+				arg="$1"
+				shift
+				ARG_SKIP_PATTERN="$arg"
 			else
 				err "Unknown argument '$arg'"
 			fi
@@ -372,7 +400,7 @@ main() {
 
 	if [ "${#markdown_files[@]}" = "0" ]
 	then
-		usage
+		usage 1>&2
 		exit 1
 	fi
 
