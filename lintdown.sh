@@ -184,7 +184,7 @@ skip_snippet() {
 # wrap_c_main [snippet]
 wrap_c_main() {
 	local snippet="$snippet"
-	[ "$ARG_WRAP_MAIN" = 1 ] || return
+	[ "$ARG_WRAP_MAIN" = 1 ] || return 0
 
 	log "wrapping snippet $snippet"
 
