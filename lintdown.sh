@@ -34,6 +34,7 @@ RUBOCOP_ARGS=${RUBOCOP_ARGS:---except Style/FrozenStringLiteralComment,Lint/Scri
 # regex if matched in the snippet the snippet
 # will not be linted
 ARG_SKIP_PATTERN="${ARG_SKIP_PATTERN:-}"
+ARG_WRAP_MAIN="${ARG_WRAP_MAIN:-}"
 
 err() {
 	printf '[lintdown.sh][-] %s\n' "$1" 1>&2
@@ -173,6 +174,17 @@ skip_snippet() {
 	return 1
 }
 
+# wrap_c_main [snippet]
+wrap_c_main() {
+	local snippet="$snippet"
+	[ "$ARG_WRAP_MAIN" = 1 ] || return
+
+	log "wrapping snippet $snippet"
+
+	prepend_file "$snippet" "int main() {"
+	echo "}" >> "$snippet"
+}
+
 lint_c_snippets() {
 	local markdown_file="$1"
 	gen_snippets "$markdown_file" c c
@@ -181,6 +193,7 @@ lint_c_snippets() {
 	for snippet in "$TMP_DIR"/readme_snippet_*.c; do
 		skip_snippet "$snippet" && continue
 
+		wrap_c_main "$snippet"
 		patch_c_includes "$snippet"
 
 		log "building $snippet ..."
@@ -339,6 +352,7 @@ usage() {
 	usage: lintdown.sh FILENAME..
 	arguments:
 	  --skip-pattern PATTERN      skip snippets that match the given regex"
+	  --wrap-main                 wraps the code in a main function (only C supported for now)"
 	EOF
 }
 
@@ -390,6 +404,9 @@ main() {
 				arg="$1"
 				shift
 				ARG_SKIP_PATTERN="$arg"
+			elif [ "$arg" == "--wrap-main" ]
+			then
+				ARG_WRAP_MAIN=1
 			else
 				err "Unknown argument '$arg'"
 			fi
