@@ -44,21 +44,28 @@ log() {
 }
 
 USER="${USER:-user}"
-if ! TMP_DIR="$(mktemp -d "/tmp/lintdown_sh_${USER}_XXXXXXXX")"
-then
-	err "failed to mktemp"
-	exit 1
-fi
-if [ ! -d "$TMP_DIR" ]
-then
-	err "failed to create temp directory $TMP_DIR"
-	exit 1
-fi
 
 cleanup() {
+	[ "${TMP_DIR:-}" = "" ] && return
+
 	rm -rf "$TMP_DIR"
 }
 
+refresh_tmp_dir() {
+	cleanup
+	if ! TMP_DIR="$(mktemp -d "/tmp/lintdown_sh_${USER}_XXXXXXXX")"
+	then
+		err "failed to mktemp"
+		exit 1
+	fi
+	if [ ! -d "$TMP_DIR" ]
+	then
+		err "failed to create temp directory $TMP_DIR"
+		exit 1
+	fi
+}
+
+refresh_tmp_dir
 trap cleanup EXIT
 
 # lint_failed [snippet] [filename]
@@ -369,6 +376,8 @@ lint_file() {
 		err "file not found '$file'"
 		exit 1
 	fi
+
+	refresh_tmp_dir
 
 	lint_c_snippets "$file"
 	lint_go_snippets "$file"
