@@ -56,18 +56,21 @@ cleanup() {
 
 trap cleanup EXIT
 
+# lint_failed [snippet] [filename]
 lint_failed() {
 	local snippet="$1"
-	err "linter failed on $(basename "$snippet") check the errors above"
+	local filename="$2"
+	err "linter failed on $(basename "$snippet") in $filename check the errors above"
 	err "snippet content:"
 	cat "$snippet" 1>&2
 	exit 1
 }
 
-# run_linter_or_die [linter] [snippet]
+# run_linter_or_die [linter] [snippet] [filename]
 run_linter_or_die() {
 	local linter="$1"
 	local snippet="$2"
+	local filename="$3"
 
 	local linter_args_var
 	linter_args_var="${linter^^}_ARGS"
@@ -80,11 +83,13 @@ run_linter_or_die() {
 	set -u
 
 	# shellcheck disable=SC2086
-	"$linter" $linter_args "$snippet" || lint_failed "$snippet"
+	"$linter" $linter_args "$snippet" || lint_failed "$snippet" "$filename"
 }
 
+# try_linters [snippet] [filename] [linters..]
 try_linters() {
 	local snippet="$1"
+	local filename="$2"
 	shift
 	local linter
 	for linter in "$@"
@@ -92,7 +97,7 @@ try_linters() {
 		[ -x "$(command -v "$linter")" ] || continue
 		log "found $linter"
 
-		run_linter_or_die "$linter" "$snippet"
+		run_linter_or_die "$linter" "$snippet" "$filename"
 	done
 }
 
@@ -161,7 +166,7 @@ lint_c_snippets() {
 
 		log "building $snippet ..."
 		# shellcheck disable=2086
-		"$CC" $CFLAGS "$snippet" -o "$TMP_DIR"/tmp $LDFLAGS $LDLIBS || lint_failed "$snippet"
+		"$CC" $CFLAGS "$snippet" -o "$TMP_DIR"/tmp $LDFLAGS $LDLIBS || lint_failed "$snippet" "$markdown_file"
 	done
 }
 
@@ -173,7 +178,7 @@ lint_go_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "building $snippet ..."
-		go build -v -o "$TMP_DIR"/tmp "$snippet" || lint_failed "$snippet"
+		go build -v -o "$TMP_DIR"/tmp "$snippet" || lint_failed "$snippet" "$markdown_file"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.go; do
@@ -181,7 +186,7 @@ lint_go_snippets() {
 
 		log "checking format $snippet ..."
 		if ! diff -u <(echo -n) <(gofmt -d "$snippet"); then
-			lint_failed "$snippet"
+			lint_failed "$snippet" "$markdown_file"
 		fi
 	done
 }
@@ -194,7 +199,7 @@ lint_lua_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		run_linter_or_die luacheck "$snippet"
+		run_linter_or_die luacheck "$snippet" "$markdown_file"
 	done
 }
 
@@ -207,7 +212,7 @@ lint_ruby_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		run_linter_or_die rubocop "$snippet"
+		run_linter_or_die rubocop "$snippet" "$markdown_file"
 	done
 }
 
@@ -234,14 +239,14 @@ lint_shell_snippets() {
 
 		log "checking $snippet ..."
 		add_shell_shebang "$snippet"
-		run_linter_or_die shellcheck "$snippet"
+		run_linter_or_die shellcheck "$snippet" "$markdown_file"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.bash; do
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		run_linter_or_die shellcheck "$snippet"
+		run_linter_or_die shellcheck "$snippet" "$markdown_file"
 	done
 }
 
@@ -257,14 +262,14 @@ lint_python_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "compiling $snippet ..."
-		python -m compileall "$snippet"  || lint_failed "$snippet"
+		python -m compileall "$snippet"  || lint_failed "$snippet" "$markdown_file"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.py; do
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		try_linters "$snippet" pylint mypy pyright
+		try_linters "$snippet" "$markdown_file" pylint mypy pyright
 	done
 }
 
@@ -280,7 +285,7 @@ lint_javascript_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "checking $snippet ..."
-		try_linters "$snippet" eslint standard
+		try_linters "$snippet" "$markdown_file" eslint standard
 	done
 }
 
@@ -294,14 +299,14 @@ lint_typescript_snippets() {
 		[ -f "$snippet" ] || continue
 
 		log "building $snippet ..."
-		run_linter_or_die tsc "$snippet"
+		run_linter_or_die tsc "$snippet" "$markdown_file"
 	done
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.ts; do
 		[ -f "$snippet" ] || continue
 
 		log "linting $snippet ..."
-		try_linters "$snippet" ts-standard
+		try_linters "$snippet" "$markdown_file" ts-standard
 	done
 }
 
