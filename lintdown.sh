@@ -13,7 +13,7 @@ LINTDOWN_VERSION='1.0.0'
 CC="${CC:-gcc}"
 LDFLAGS="${LDFLAGS:-}"
 LDLIBS="${LDLIBS:-}"
-CFLAGS="${CLFAGS:-}"
+CFLAGS="${CFLAGS:-}"
 
 # for python
 # shellcheck disable=SC2034
