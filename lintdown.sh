@@ -14,6 +14,10 @@ CC="${CC:-gcc}"
 LDFLAGS="${LDFLAGS:-}"
 LDLIBS="${LDLIBS:-}"
 CFLAGS="${CFLAGS:-}"
+# comma separated list of h headers
+# for example:
+# C_INCLUDES=stdio.h,stdint.h
+C_INCLUDES="${C_INCLUDES:-}"
 
 # for python
 # shellcheck disable=SC2034
@@ -121,6 +125,30 @@ gen_snippets() {
 	done < "$markdown_file"
 }
 
+# prepend_file [filename] [content]
+prepend_file() {
+	local filename="$1"
+	local content="$2"
+	tmp_file="$filename.tmp"
+	{
+		printf -- '%s\n' "$content"
+		cat "$filename"
+	} > "$tmp_file"
+	mv "$tmp_file" "$filename"
+}
+
+# patch_c_includes [filename]
+patch_c_includes() {
+	local filename="$1"
+	[[ "$C_INCLUDES" = "" ]] && return
+
+	log "patching $filename with includes $C_INCLUDES ..."
+	IFS=',' read -ra ADDR <<< "$C_INCLUDES"
+	for include in "${ADDR[@]}"; do
+	  prepend_file "$filename" "#include <$include>"
+	done
+}
+
 lint_c_snippets() {
 	local markdown_file="$1"
 	gen_snippets "$markdown_file" c c
@@ -128,6 +156,8 @@ lint_c_snippets() {
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.c; do
 		[ -f "$snippet" ] || continue
+
+		patch_c_includes "$snippet"
 
 		log "building $snippet ..."
 		# shellcheck disable=2086

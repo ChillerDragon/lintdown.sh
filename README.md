@@ -89,6 +89,8 @@ for example ``CC=clang lintdown.sh README.md``
 You can also set LDFLAGS, LDLIBS, CFLAGS if you want to link some libraries or set compiler options
 such as ``LDLIBS=-lSDL lintdown.sh README.md``
 
+You can also load additional includes using ``C_INCLUDES=stdio.h,stdint.h``
+
 ## Projects using lintdown.sh
 
 - https://github.com/teeworlds-go/protocol/ - go lang ([github action](https://github.com/teeworlds-go/protocol/blob/bee29bd3ecb6c688c07d72be66e452eac95045d6/.github/workflows/main.yml#L33-L38))
