@@ -159,7 +159,6 @@ patch_c_includes() {
 	local filename="$1"
 	[[ "$C_INCLUDES" = "" ]] && return
 
-	log "patching $filename with includes $C_INCLUDES ..."
 	IFS=',' read -ra ADDR <<< "$C_INCLUDES"
 	for include in "${ADDR[@]}"; do
 	  prepend_file "$filename" "#include <$include>"
@@ -185,8 +184,6 @@ skip_snippet() {
 wrap_c_main() {
 	local snippet="$snippet"
 	[ "$ARG_WRAP_MAIN" = 1 ] || return 0
-
-	log "wrapping snippet $snippet"
 
 	prepend_file "$snippet" "int main() {"
 	echo "}" >> "$snippet"
