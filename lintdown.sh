@@ -11,9 +11,11 @@ LINTDOWN_VERSION='1.0.0'
 # for C
 # https://www.gnu.org/software/make/manual/html_node/Implicit-Variables.html
 CC="${CC:-gcc}"
+CXX="${CXX:-g++}"
 LDFLAGS="${LDFLAGS:-}"
 LDLIBS="${LDLIBS:-}"
 CFLAGS="${CFLAGS:-}"
+CXXFLAGS="${CXXFLAGS:-}"
 # comma separated list of h headers
 # for example:
 # C_INCLUDES=stdio.h,stdint.h
@@ -206,6 +208,23 @@ lint_c_snippets() {
 	done
 }
 
+lint_cpp_snippets() {
+	local markdown_file="$1"
+	gen_snippets "$markdown_file" cpp cpp
+	gen_snippets "$markdown_file" c++ cpp
+
+	for snippet in "$TMP_DIR"/readme_snippet_*.cpp; do
+		skip_snippet "$snippet" && continue
+
+		wrap_c_main "$snippet"
+		patch_c_includes "$snippet"
+
+		log "building $snippet ..."
+		# shellcheck disable=2086
+		"$CXX" $CXXFLAGS "$snippet" -o "$TMP_DIR"/tmp $LDFLAGS $LDLIBS || lint_failed "$snippet" "$markdown_file"
+	done
+}
+
 lint_go_snippets() {
 	local markdown_file="$1"
 	gen_snippets "$markdown_file" go
@@ -377,6 +396,7 @@ lint_file() {
 	refresh_tmp_dir
 
 	lint_c_snippets "$file"
+	lint_cpp_snippets "$file"
 	lint_go_snippets "$file"
 	lint_lua_snippets "$file"
 	lint_ruby_snippets "$file"
