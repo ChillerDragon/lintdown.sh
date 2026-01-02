@@ -20,9 +20,15 @@ trap on_exit EXIT
 # Expect invalid snippets to fail
 if ./lintdown.sh tests/invalid_snippets.md &>/dev/null
 then
-	printf 'Error: expected lint to fail but it passed!\n'
+	printf 'Error: expected lint of tests/invalid_snippets.md to fail but it passed!\n'
 	exit 1
 fi
 
 # Extract C code from C and patch includes and wrap it in a main function
 C_INCLUDES=stdio.h ./lintdown.sh tests/valid_snippets.h --wrap-main
+
+if C_INCLUDES=stdio.h ./lintdown.sh tests/invalid_snippets.h --wrap-main &>/dev/null
+then
+	printf 'Error: expected lint of tests/invalid_snippets.h to fail but it passed!\n'
+	exit 1
+fi
