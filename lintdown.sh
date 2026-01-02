@@ -115,6 +115,40 @@ try_linters() {
 	done
 }
 
+# Extract example code snippets from documentation comments
+gen_snippets_from_c_header() {
+	local header_file="$1"
+	local snippet_lang="$2"
+	local lang_extension="${3:-$snippet_lang}"
+
+	local in_snippet=0
+	local snippet_num=0
+	local snippet_path="invalid_snippet.txt"
+
+
+	# TODO: detect comment style and support //, /// and /*
+
+	while IFS='' read -r line
+	do
+		if [[ "$line" =~ ^///\ \`\`\`$snippet_lang$ ]]
+		then
+			snippet_path="$TMP_DIR/c_header_snippet_${snippet_num}.${lang_extension}"
+			:>"$snippet_path"
+			snippet_num="$((snippet_num + 1))"
+			in_snippet=1
+			continue
+		fi
+		if [ "$line" == '/// ```' ] && [ "$in_snippet" == 1 ]
+		then
+			in_snippet=0
+		fi
+		[ "$in_snippet" = 1 ] || continue
+
+		printf -- '%s\n' "${line:3}" >> "$snippet_path"
+	done < "$header_file"
+}
+
+# Extract code snippets from markdown code blocks
 gen_snippets_from_markdown() {
 	local markdown_file="$1"
 	local markdown_lang="$2"
@@ -191,12 +225,29 @@ wrap_c_main() {
 	echo "}" >> "$snippet"
 }
 
+gen_snippets() {
+	local source_file="$1"
+	local snippet_lang="$2"
+	local lang_extension="${3:-$snippet_lang}"
+
+	if [[ "$source_file" = *.md ]]
+	then
+		gen_snippets_from_markdown "$source_file" "$snippet_lang" "$lang_extension"
+	elif [[ "$source_file" = *.h ]]
+	then
+		gen_snippets_from_c_header "$source_file" "$snippet_lang" "$lang_extension"
+	else
+		err "unknown file extension for file '$source_file'. Only .md and .h are supported"
+		exit 1
+	fi
+}
+
 lint_c_snippets() {
 	local markdown_file="$1"
-	gen_snippets_from_markdown "$markdown_file" c c
-	gen_snippets_from_markdown "$markdown_file" C c
+	gen_snippets "$markdown_file" c c
+	gen_snippets "$markdown_file" C c
 
-	for snippet in "$TMP_DIR"/readme_snippet_*.c; do
+	for snippet in "$TMP_DIR"/c_header_snippet_*.c "$TMP_DIR"/readme_snippet_*.c; do
 		skip_snippet "$snippet" && continue
 
 		wrap_c_main "$snippet"

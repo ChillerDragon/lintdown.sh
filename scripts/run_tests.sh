@@ -23,3 +23,6 @@ then
 	printf 'Error: expected lint to fail but it passed!\n'
 	exit 1
 fi
+
+# Extract C code from C and patch includes and wrap it in a main function
+C_INCLUDES=stdio.h ./lintdown.sh tests/valid_snippets.h --wrap-main
