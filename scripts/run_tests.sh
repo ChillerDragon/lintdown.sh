@@ -2,6 +2,18 @@
 
 set -eu
 
+on_exit() {
+	if [ "$?" -eq 0 ]
+	then
+		printf '[+] OK all tests passed.\n'
+		exit 0
+	fi
+	printf '[+] ERROR tests failed!\n'
+	exit 1
+}
+
+trap on_exit EXIT
+
 # Expect all valid snippets to pass
 ./lintdown.sh tests/valid_snippets.md
 
@@ -11,5 +23,3 @@ then
 	printf 'Error: expected lint to fail but it passed!\n'
 	exit 1
 fi
-
-printf '[+] OK all tests passed.\n'

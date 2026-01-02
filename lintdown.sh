@@ -115,7 +115,7 @@ try_linters() {
 	done
 }
 
-gen_snippets() {
+gen_snippets_from_markdown() {
 	local markdown_file="$1"
 	local markdown_lang="$2"
 	local lang_extension="${3:-$markdown_lang}"
@@ -193,8 +193,8 @@ wrap_c_main() {
 
 lint_c_snippets() {
 	local markdown_file="$1"
-	gen_snippets "$markdown_file" c c
-	gen_snippets "$markdown_file" C c
+	gen_snippets_from_markdown "$markdown_file" c c
+	gen_snippets_from_markdown "$markdown_file" C c
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.c; do
 		skip_snippet "$snippet" && continue
@@ -210,8 +210,8 @@ lint_c_snippets() {
 
 lint_cpp_snippets() {
 	local markdown_file="$1"
-	gen_snippets "$markdown_file" cpp cpp
-	gen_snippets "$markdown_file" c++ cpp
+	gen_snippets_from_markdown "$markdown_file" cpp cpp
+	gen_snippets_from_markdown "$markdown_file" c++ cpp
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.cpp; do
 		skip_snippet "$snippet" && continue
@@ -227,7 +227,7 @@ lint_cpp_snippets() {
 
 lint_go_snippets() {
 	local markdown_file="$1"
-	gen_snippets "$markdown_file" go
+	gen_snippets_from_markdown "$markdown_file" go
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.go; do
 		[ -f "$snippet" ] || continue
@@ -248,7 +248,7 @@ lint_go_snippets() {
 
 lint_lua_snippets() {
 	local markdown_file="$1"
-	gen_snippets "$markdown_file" lua
+	gen_snippets_from_markdown "$markdown_file" lua
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.lua; do
 		[ -f "$snippet" ] || continue
@@ -261,7 +261,7 @@ lint_lua_snippets() {
 lint_ruby_snippets() {
 	local markdown_file="$1"
 	local snippet
-	gen_snippets "$markdown_file" ruby rb
+	gen_snippets_from_markdown "$markdown_file" ruby rb
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.rb; do
 		[ -f "$snippet" ] || continue
@@ -285,9 +285,9 @@ add_shell_shebang() {
 lint_shell_snippets() {
 	local markdown_file="$1"
 	local snippet
-	gen_snippets "$markdown_file" shell sh
-	gen_snippets "$markdown_file" bash bash
-	gen_snippets "$markdown_file" sh sh
+	gen_snippets_from_markdown "$markdown_file" shell sh
+	gen_snippets_from_markdown "$markdown_file" bash bash
+	gen_snippets_from_markdown "$markdown_file" sh sh
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.sh; do
 		[ -f "$snippet" ] || continue
@@ -308,10 +308,10 @@ lint_shell_snippets() {
 lint_python_snippets() {
 	local markdown_file="$1"
 	local snippet
-	gen_snippets "$markdown_file" py
-	gen_snippets "$markdown_file" python py
-	gen_snippets "$markdown_file" python3 py
-	gen_snippets "$markdown_file" python2 py
+	gen_snippets_from_markdown "$markdown_file" py
+	gen_snippets_from_markdown "$markdown_file" python py
+	gen_snippets_from_markdown "$markdown_file" python3 py
+	gen_snippets_from_markdown "$markdown_file" python2 py
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.py; do
 		[ -f "$snippet" ] || continue
@@ -331,10 +331,10 @@ lint_python_snippets() {
 lint_javascript_snippets() {
 	local markdown_file="$1"
 	local snippet
-	gen_snippets "$markdown_file" js
-	gen_snippets "$markdown_file" javascript js
-	gen_snippets "$markdown_file" JavaScript js
-	gen_snippets "$markdown_file" node js
+	gen_snippets_from_markdown "$markdown_file" js
+	gen_snippets_from_markdown "$markdown_file" javascript js
+	gen_snippets_from_markdown "$markdown_file" JavaScript js
+	gen_snippets_from_markdown "$markdown_file" node js
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.js; do
 		[ -f "$snippet" ] || continue
@@ -347,8 +347,8 @@ lint_javascript_snippets() {
 lint_typescript_snippets() {
 	local markdown_file="$1"
 	local snippet
-	gen_snippets "$markdown_file" typescript ts
-	gen_snippets "$markdown_file" TypeScript ts
+	gen_snippets_from_markdown "$markdown_file" typescript ts
+	gen_snippets_from_markdown "$markdown_file" TypeScript ts
 
 	for snippet in "$TMP_DIR"/readme_snippet_*.ts; do
 		[ -f "$snippet" ] || continue
